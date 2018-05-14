@@ -1,0 +1,106 @@
+CREATE DATABASE IF NOT EXISTS `tracker` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `tracker`;
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `userid` int(10) unsigned NOT NULL,
+  `alias` varchar(20) DEFAULT '',
+  `login` varchar(20) DEFAULT '',
+  `password` varchar(50) DEFAULT '',
+  `email` varchar(100) DEFAULT '',
+  `cellphone` varchar(20) DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='User table';
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`userid`),
+  ADD UNIQUE KEY `alias` (`alias`),
+  ADD UNIQUE KEY `login` (`login`) ,
+  MODIFY `userid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
+CREATE TABLE IF NOT EXISTS `userdevice` (
+  `userid` int(10) unsigned,
+  `deviceid` int(10) unsigned
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='link between user and device';
+
+CREATE TABLE IF NOT EXISTS `device` (
+  `deviceid` int(10) unsigned NOT NULL,
+  `name` varchar(20) DEFAULT '',
+  `iconeid`  int(10) unsigned DEFAULT '0',
+  `cellphone` varchar(20) DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='device table';
+ALTER TABLE `device`
+  ADD PRIMARY KEY (`deviceid`),
+  ADD KEY `name` (`name`),
+  ADD UNIQUE KEY `cellphone` (`cellphone`) ,
+  MODIFY `deviceid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
+CREATE TABLE IF NOT EXISTS `devicealerte` (
+  `deviceid` int(10) unsigned,
+  `alerteid` int(10) unsigned
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='link between device and alerte definition';
+
+CREATE TABLE IF NOT EXISTS `alerte` (
+  `alerteid` int(10) unsigned NOT NULL,
+  `contact` varchar(100) DEFAULT '',
+  `zone` BOOL DEFAULT '0',
+  `sos` BOOL DEFAULT '0',
+  `mvt` BOOL DEFAULT '0',
+  `lowbat` BOOL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='alerte definition';
+ALTER TABLE `alerte`
+  ADD PRIMARY KEY (`alerteid`),
+  MODIFY `alerteid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
+CREATE TABLE IF NOT EXISTS `message` (
+  `messageid` int(10) unsigned NOT NULL,
+  `alertid`  int(10) unsigned,
+  `date` DATETIME,
+  `message` varchar(100)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Message send after an alerte';
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`messageid`),
+  ADD KEY `date` (`date`),
+  MODIFY `messageid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
+CREATE TABLE IF NOT EXISTS `messagedevice` (
+  `deviceid`  int(10) unsigned,
+  `msgid`  int(10) unsigned
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='link between device and message';
+
+CREATE TABLE IF NOT EXISTS `location` (
+  `locationid` int(10) unsigned NOT NULL,
+  `date` DATETIME,
+  `latitude` decimal(13,10) NOT NULL DEFAULT '0.0000000000',
+  `longitude` decimal(13,10) NOT NULL DEFAULT '0.0000000000',
+  `speed` INT(3) DEFAULT '0',
+  `altitude` INT(5) DEFAULT '0',
+  `address1` varchar(100) DEFAULT '',
+  `address2` varchar(100) DEFAULT '',
+  `city` varchar(50) DEFAULT '',
+  `state` varchar(20) DEFAULT NULL,
+  `postal_code` varchar(20) DEFAULT '',
+  `country` varchar(30) DEFAULT '',
+  `gpsQ` INT(3) DEFAULT '0',
+  `distance` INT(100) DEFAULT '0',
+  `battery` INT(3) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='location of a device at time T, will be history of location';
+ALTER TABLE `location`
+  ADD PRIMARY KEY (`locationid`),
+  ADD KEY `date` (`date`),
+  ADD KEY `city`(`city`),
+  MODIFY `locationid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
+CREATE TABLE IF NOT EXISTS `locationdevice` (
+  `deviceid` int(10) unsigned,
+  `locationid` int(10) unsigned
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='link beewteen location and device';
+
+CREATE TABLE IF NOT EXISTS `history` (
+  `historyid` int(10) unsigned NOT NULL,
+  `deviceid` int(10) unsigned,
+  `commande` varchar(20),
+  `date` DATETIME
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='hisotry of command';
+ALTER TABLE `history`
+  ADD PRIMARY KEY (`historyid`),
+  ADD KEY `deviceid` (`deviceid`),
+  MODIFY `historyid` int(10) unsigned NOT NULL AUTO_INCREMENT;
+
